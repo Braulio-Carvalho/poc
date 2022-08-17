@@ -4,14 +4,15 @@ import br.com.productservice.domain.entities.Produto
 import br.com.productservice.domain.exceptions.ProdutoNaoEncontradoException
 import br.com.productservice.domain.services.ProdutoService
 import br.com.productservice.resources.repositories.ProdutoRepository
-import org.springframework.data.domain.Example
-import org.springframework.data.domain.ExampleMatcher
+import br.com.productservice.resources.repositories.specifications.ProdutoSpecification
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.util.*
 
 @Service
-class ProdutoServiceImpl(private val repository: ProdutoRepository) : ProdutoService {
+class ProdutoServiceImpl(
+    private val repository: ProdutoRepository,
+    private val specification: ProdutoSpecification) : ProdutoService {
 
     override fun listarTodosProdutos(): List<Produto> {
         return repository.findAll()
@@ -21,25 +22,12 @@ class ProdutoServiceImpl(private val repository: ProdutoRepository) : ProdutoSer
         return repository.findById(id).orElseThrow { ProdutoNaoEncontradoException() }
     }
 
-    override fun listarProdutoPorNomeERange(
-        nome: String?,
-        dataInicial: LocalDate?,
-        dataFinal: LocalDate?
-    ): List<Produto?> {
-        return repository.findByNomeAndDataCadastroBetween(nome, dataInicial, dataFinal)
+    override fun listarProdutoPorNome(nome: String): List<Produto?> {
+        return repository.findByNome(nome)
     }
 
-    fun filtroProduto(filtro: Produto){
-
-        val matcherFilter = ExampleMatcher.matching()
-            .withIgnoreCase()
-            .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING)
-            .withIgnoreNullValues()
-            .withIgnorePaths("id")
-
-        val example = Example.of(filtro)
-
-
+    override fun buscarPorNomeERangeDeData(nome: String, dataInicial: LocalDate, dataFinal: LocalDate): List<Produto>{
+        return repository.findAll(specification.buscarPorNomeERangeDeDataEspecification(nome, dataInicial, dataFinal))
     }
 
     override fun cadastrarProduto(produto: Produto): Produto {

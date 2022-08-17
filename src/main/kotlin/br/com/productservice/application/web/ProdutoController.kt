@@ -33,10 +33,8 @@ class ProdutoController(val produtoService: ProdutoService) {
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("listar-por-nome")
     fun listarProdutosPorNome(
-        @RequestParam(required = false) @PathParam("nome") nome: String?,
-        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)  @PathParam("dataInicial") dataInicial: LocalDate?,
-        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)  @PathParam("dataFinal") dataFinal: LocalDate?
-    ) = produtoService.listarProdutoPorNome(nome, dataInicial, dataFinal)
+        @RequestParam(required = false) @PathParam("nome") nome: String
+    ) = produtoService.listarProdutoPorNome(nome)
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
@@ -49,4 +47,14 @@ class ProdutoController(val produtoService: ProdutoService) {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("{id}")
     fun deletar(@PathVariable id: UUID) = produtoService.deletarProdutoPorId(id)
+
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping("/filtro")
+    fun buscarPorNomeERangeDeData(
+        @RequestParam nome: String,
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) dataInicial: LocalDate,
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) dataFinal: LocalDate
+    ): List<Produto> {
+        return produtoService.buscarPorNomeERangeDeData(nome, dataInicial, dataFinal)
+    }
 }

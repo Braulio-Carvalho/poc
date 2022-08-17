@@ -11,11 +11,9 @@ interface ProdutoService {
 
     fun listarProdutoPorId(id: UUID): Produto
 
-    fun listarProdutoPorNomeERange(
-        nome: String?,
-        dataCadastroStart: LocalDate?,
-        dataCadastroEnd: LocalDate?
-    ): List<Produto?>
+    fun listarProdutoPorNome(nome: String): List<Produto?>
+
+    fun buscarPorNomeERangeDeData(nome: String, dataInicial: LocalDate, dataFinal: LocalDate): List<Produto>
 
     fun cadastrarProduto(produto: Produto): Produto
 
