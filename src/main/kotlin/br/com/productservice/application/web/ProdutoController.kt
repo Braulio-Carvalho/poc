@@ -2,21 +2,14 @@ package br.com.productservice.application.web
 
 import br.com.productservice.domain.entities.Produto
 import br.com.productservice.domain.services.ProdutoService
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
+import org.springframework.data.repository.query.Param
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.HttpStatus
-import org.springframework.web.bind.annotation.DeleteMapping
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.PutMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.ResponseStatus
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import java.time.LocalDate
-import java.util.UUID
-import javax.websocket.server.PathParam
+import java.util.*
 
 @RestController
 @RequestMapping("/produtos")
@@ -33,7 +26,7 @@ class ProdutoController(val produtoService: ProdutoService) {
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("listar-por-nome")
     fun listarProdutosPorNome(
-        @RequestParam(required = false) @PathParam("nome") nome: String
+        @RequestParam(required = false) @Param("nome") nome: String
     ) = produtoService.listarProdutoPorNome(nome)
 
     @ResponseStatus(HttpStatus.CREATED)
@@ -51,10 +44,20 @@ class ProdutoController(val produtoService: ProdutoService) {
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/filtro")
     fun buscarPorNomeERangeDeData(
-        @RequestParam nome: String,
-        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) dataInicial: LocalDate,
-        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) dataFinal: LocalDate
+            @RequestParam(defaultValue = "") nome: String?,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) dataInicial: LocalDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) dataFinal: LocalDate,
+            pageable: Pageable
+    ): Page<Produto> {
+        return produtoService.buscarPorNomeERangeDeData(nome, dataInicial, dataFinal, pageable)
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping("/fabricacao")
+    fun buscarPorFabricacao(
+            @RequestParam(required = false) id: UUID?,
+            @RequestParam(required = false, defaultValue = "") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) dataFabricacao: LocalDate?
     ): List<Produto> {
-        return produtoService.buscarPorNomeERangeDeData(nome, dataInicial, dataFinal)
+        return produtoService.buscarPorDataFabricacao(id, dataFabricacao)
     }
 }
